@@ -1,0 +1,27 @@
+@keyframes upper-lip-animation {
+    0%,
+    100% {
+        d: path('M0,25 Q50,20 100,25');
+    }
+    50% {
+        d: path('M0,25 Q50,15 100,25');
+    }
+}
+
+@keyframes lower-lip-animation {
+    0%,
+    100% {
+        d: path('M0,25 Q50,30 100,25');
+    }
+    50% {
+        d: path('M0,25 Q50,35 100,25');
+    }
+}
+
+.talking #upper-lip {
+    animation: upper-lip-animation 1s linear infinite;
+}
+
+.talking #lower-lip {
+    animation: lower-lip-animation 1s linear infinite;
+}
