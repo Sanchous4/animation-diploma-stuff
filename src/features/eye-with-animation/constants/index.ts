@@ -7,7 +7,7 @@ interface Animation {
 
 export const STATIC_ANIMATION: Animation = {
     to: {
-        duration: 30,
+        duration: 0.3,
         ease: Power1.easeOut,
     },
     timeLine: {},
@@ -15,7 +15,7 @@ export const STATIC_ANIMATION: Animation = {
 
 export const DYNAMIC_ANIMATION: Animation = {
     to: {
-        duration: 30,
+        duration: 0.3,
         ease: Power1.easeInOut,
     },
     timeLine: {repeat: 1, yoyo: true},

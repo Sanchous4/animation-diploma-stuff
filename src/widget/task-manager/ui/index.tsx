@@ -3,8 +3,12 @@ import {Box, styled} from '@mui/material';
 import {TaskCodeBlock} from 'features/task-code-block';
 import {TaskAnswerList} from 'features/task-answer-list/ui';
 import {AssistantWithSpeech} from 'widget/assistant-with-speech';
-import { getText } from '../lib/getText';
-import { tasks } from '../model/mockData';
+import {getText} from '../lib/getText';
+import {tasks} from '../model/mockData';
+import {getActionStage} from '../lib/getAction';
+import {useAnimateMountWithEmotions} from 'features/mouth-with-animation';
+import {useAssistantState} from 'widget/virtual-assistant/model';
+import {useAssistantActions} from 'widget/virtual-assistant/model';
 
 const Root = styled(Box)`
     display: flex;
@@ -89,44 +93,98 @@ export const TaskManager = () => {
 
     const [strategyIndex, setStrategyIndex] = useState(-1);
 
-
     useEffect(() => {
-      setStrategyIndex(Math.floor(Math.random() * 6))
-    }, [])
+        setStrategyIndex(Math.floor(Math.random() * 6));
+    }, []);
 
     const [currentText, setText] = useState('');
 
     const [isWrongStep, setIsWrongStep] = useState(false);
     const [isTaskFinished, setTaskFinished] = useState(false);
+
+    const {setMouthEmotion, setEyesEmotion} = useAssistantActions();
+    const [title, setTitle] = useState(
+        'Напишите функцию вычисления числа Фибоначи через while'
+    );
+
+    const [timeBlink, setTimeBlink] = useState(100);
+
+    useEffect(() => {
+        const time = setTimeout(() => {
+            setEyesEmotion({
+                behaviorEyelid: 'blink',
+                behaviorPupil: '',
+            });
+            setTimeBlink(Math.floor((Math.random() + 1) * 10000));
+        }, timeBlink);
+    }, [timeBlink, setEyesEmotion]);
+
     return (
         <Box sx={{translate: '0px 25px'}}>
-            <AssistantWithSpeech
-                title='Все верно'
-                message={currentText}
-            />
+            <AssistantWithSpeech title={title} message={currentText} />
             <Root>
                 <TaskCodeBlock
                     code={tasks[currentTask].stages[currentStep].code}
                     sx={{marginRight: '12px'}}
                 />
                 <TaskAnswerList
-                    options={tasks[currentTask].stages[currentStep].answerOptions ? tasks[currentTask].stages[currentStep].answerOptions as [] : []}
+                    options={
+                        tasks[currentTask].stages[currentStep].answerOptions
+                            ? (tasks[currentTask].stages[currentStep]
+                                  .answerOptions as [])
+                            : []
+                    }
                     correctValue={tasks[0].stages[currentStep].correctValue}
                     isWrongStep={isWrongStep}
                     isTaskFinished={isTaskFinished}
                     completeCallback={(_value, isCorrect) => {
                         if (isCorrect) {
+                            setTitle('Новое задание');
                             setIsWrongStep(false);
-                            if (currentStep + 1 === tasks[currentTask].stages.length - 1) {
+                            setMouthEmotion('happy');
+                            if (
+                                currentStep + 1 ===
+                                tasks[currentTask].stages.length - 1
+                            ) {
                                 setTaskFinished(true);
+                            } else {
+                                setMouthEmotion('speak');
+                                setText(
+                                    getText(
+                                        false,
+                                        strategyIndex,
+                                        currentTask,
+                                        currentStep + 1
+                                    ) || ''
+                                );
+                                setTimeout(() => {
+                                    setMouthEmotion('natural');
+                                }, 1000);
                             }
-                            else {
-                              setText(getText(false, strategyIndex, currentTask, currentStep + 1 ) || '')
-                            }
-                              setStep((currentStep) => currentStep + 1);
+                            setStep((currentStep) => currentStep + 1);
                         } else {
-                            setText(getText(false, strategyIndex, currentTask, currentStep) || '')
+                            setTitle(
+                                title === 'К сожалению ошибка'
+                                    ? 'К сожалению ошибка'
+                                    : 'Попробуйте снова'
+                            );
+                            setMouthEmotion('speak');
+                            setText(
+                                getText(
+                                    false,
+                                    strategyIndex,
+                                    currentTask,
+                                    currentStep
+                                ) || ''
+                            );
                             setIsWrongStep(true);
+                            setTimeout(() => {
+                                setMouthEmotion('sad');
+                            }, 1000);
+
+                            setTimeout(() => {
+                                setMouthEmotion('natural');
+                            }, 3000);
                         }
                     }}
                     againCallback={() => {

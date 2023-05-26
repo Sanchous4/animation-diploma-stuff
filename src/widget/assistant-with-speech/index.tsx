@@ -19,16 +19,17 @@ export const AssistantWithSpeech: FC<Props> = (restProps) => {
                 justifyContent: 'center',
             }}
         >
-            <Box sx={{width: '348px', translate: '-70px -150px'}}>
+            <Box sx={{width: '348px', translate: '-140px -150px'}}>
                 <VirtualAssistant />
             </Box>
             <Box
                 sx={{
-                    translate: '-52px -40px',
+                    translate: '-75px -40px',
                     height: '290px',
                     width: '400px',
                     boxShadow: '0px 0px 0px 1px #e0e0e0',
                     borderRadius: '10px',
+                    overflow: 'auto',
                 }}
             >
                 <SpeechBox {...restProps} />
