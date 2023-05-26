@@ -16,7 +16,7 @@ const Root = styled(Box)`
   padding: 16px 24px 16px 24px;
   box-shadow: 0px 0px 0px 1px #e0e0e0;
   border-radius: 10px;
-  max-height: 300px;
+  height: 300px;
   overflow: auto;
   min-width: 300px;
 `;

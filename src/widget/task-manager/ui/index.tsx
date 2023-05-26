@@ -1,8 +1,10 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {Box, styled} from '@mui/material';
 import {TaskCodeBlock} from 'features/task-code-block';
 import {TaskAnswerList} from 'features/task-answer-list/ui';
 import {AssistantWithSpeech} from 'widget/assistant-with-speech';
+import { getText } from '../lib/getText';
+import { tasks } from '../model/mockData';
 
 const Root = styled(Box)`
     display: flex;
@@ -83,34 +85,47 @@ const TaskExample: IStep[] = [
 
 export const TaskManager = () => {
     const [currentStep, setStep] = useState(0);
+    const [currentTask, setTask] = useState(0);
+
+    const [strategyIndex, setStrategyIndex] = useState(-1);
+
+
+    useEffect(() => {
+      setStrategyIndex(Math.floor(Math.random() * 6))
+    }, [])
+
+    const [currentText, setText] = useState('');
 
     const [isWrongStep, setIsWrongStep] = useState(false);
     const [isTaskFinished, setTaskFinished] = useState(false);
-
     return (
-        <Box sx={{translate: '0px 50px'}}>
+        <Box sx={{translate: '0px 25px'}}>
             <AssistantWithSpeech
                 title='Все верно'
-                message='Задание выполнено'
+                message={currentText}
             />
             <Root>
                 <TaskCodeBlock
-                    code={TaskExample[currentStep].code}
+                    code={tasks[currentTask].stages[currentStep].code}
                     sx={{marginRight: '12px'}}
                 />
                 <TaskAnswerList
-                    options={TaskExample[currentStep].options}
-                    correctValue={TaskExample[currentStep].correctValue}
+                    options={tasks[currentTask].stages[currentStep].answerOptions ? tasks[currentTask].stages[currentStep].answerOptions as [] : []}
+                    correctValue={tasks[0].stages[currentStep].correctValue}
                     isWrongStep={isWrongStep}
                     isTaskFinished={isTaskFinished}
                     completeCallback={(_value, isCorrect) => {
                         if (isCorrect) {
                             setIsWrongStep(false);
-                            if (currentStep + 1 === TaskExample.length - 1) {
+                            if (currentStep + 1 === tasks[currentTask].stages.length - 1) {
                                 setTaskFinished(true);
                             }
-                            setStep((currentStep) => currentStep + 1);
+                            else {
+                              setText(getText(false, strategyIndex, currentTask, currentStep + 1 ) || '')
+                            }
+                              setStep((currentStep) => currentStep + 1);
                         } else {
+                            setText(getText(false, strategyIndex, currentTask, currentStep) || '')
                             setIsWrongStep(true);
                         }
                     }}
@@ -121,6 +136,7 @@ export const TaskManager = () => {
                         setIsWrongStep(false);
                         setTaskFinished(false);
                         setStep(0);
+                        setTask((currentTask) => currentTask + 1);
                     }}
                 />
             </Root>

@@ -9,10 +9,10 @@ const Root = styled(Box)`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 24px;
+  padding: 16px 24px 16px 24px;
   box-shadow: 0px 0px 0px 1px #e0e0e0;
   border-radius: 10px;
-  max-height: 300px;
+  height: 300px;
   min-width: 250px;
   max-width: 300px;
 
@@ -20,15 +20,15 @@ const Root = styled(Box)`
 `;
 
 interface IOption {
-  value: string;
+  value: number;
   label: string;
 }
 
 interface ITaskAnswerList {
-  options: IOption[];
-  correctValue?: string;
+  options: IOption[] | [];
+  correctValue?: number;
   isWrongStep: boolean;
-  completeCallback(currentValue: string, isCorrect: boolean): void;
+  completeCallback(currentValue: number, isCorrect: boolean): void;
   againCallback(): void;
   nextCallback(): void;
   isTaskFinished: boolean;
@@ -45,11 +45,11 @@ export function TaskAnswerList({
   nextCallback,
   ...others
 }: ITaskAnswerList) {
-  const [selectedIndex, setSelectedIndex] = React.useState('');
+  const [selectedIndex, setSelectedIndex] = React.useState(-1);
 
   const handleListItemClick = (
     _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    index: string
+    index: number
   ) => {
     if (!isWrongStep) {
       setSelectedIndex(index);
@@ -60,17 +60,17 @@ export function TaskAnswerList({
     const isCorrect = correctValue === selectedIndex;
     completeCallback(selectedIndex, isCorrect);
     if (isCorrect) {
-      setSelectedIndex('');
+      setSelectedIndex(-1);
     }
   };
 
   const handleAgainButtonClick = () => {
-    setSelectedIndex('');
+    setSelectedIndex(-1);
     againCallback();
   };
 
   const handlenextButtonClick = () => {
-    setSelectedIndex('');
+    setSelectedIndex(-1);
     nextCallback();
   };
 
@@ -88,7 +88,7 @@ export function TaskAnswerList({
     ? 'Ответить'
     : 'Еще раз';
 
-  const setColor = (value: string) => {
+  const setColor = (value: number) => {
     console.log(selectedIndex !== value || !isWrongStep);
 
     return selectedIndex !== value || !isWrongStep
