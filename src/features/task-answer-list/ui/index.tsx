@@ -85,7 +85,7 @@ export function TaskAnswerList({
   const buttonText = isTaskFinished
     ? 'Следующее задание'
     : !isWrongStep
-    ? 'Применить'
+    ? 'Ответить'
     : 'Еще раз';
 
   const setColor = (value: string) => {

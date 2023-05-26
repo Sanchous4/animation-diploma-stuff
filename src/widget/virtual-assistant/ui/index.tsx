@@ -22,7 +22,6 @@ export const VirtualAssistant = () => {
                 backgroundPosition: 'center',
                 height: '500px',
                 width: '500px',
-                translate: '-300px -100px',
             }}
         >
             <SurprisedEyes
