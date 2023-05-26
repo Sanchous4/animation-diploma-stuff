@@ -27,22 +27,20 @@ interface IOption {
 interface ITaskAnswerList {
   options: IOption[];
   correctValue?: string;
-  isCompleted: boolean;
+  isWrongStep: boolean;
   completeCallback(currentValue: string, isCorrect: boolean): void;
   againCallback(): void;
   nextCallback(): void;
-
-
-  isLastStepCorrect: boolean;
+  isTaskFinished: boolean;
   [key: string]: any;
 }
 
 export function TaskAnswerList({
   options,
   correctValue,
-  isCompleted,
+  isWrongStep,
   completeCallback,
-  isLastStepCorrect,
+  isTaskFinished,
   againCallback,
   nextCallback,
   ...others
@@ -53,37 +51,47 @@ export function TaskAnswerList({
     _event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     index: string
   ) => {
-    if (!isCompleted) {
+    if (!isWrongStep) {
       setSelectedIndex(index);
     }
   };
 
   const handleApplyButtonClick = () => {
-    completeCallback(selectedIndex, correctValue === selectedIndex);
+    const isCorrect = correctValue === selectedIndex;
+    completeCallback(selectedIndex, isCorrect);
+    if (isCorrect) {
+      setSelectedIndex('');
+    }
   };
 
   const handleAgainButtonClick = () => {
-    setSelectedIndex('')
-    againCallback()
+    setSelectedIndex('');
+    againCallback();
   };
 
   const handlenextButtonClick = () => {
-    setSelectedIndex('')
-    nextCallback()
+    setSelectedIndex('');
+    nextCallback();
   };
 
   const buttonClickAction = () => {
-    !isCompleted
-          ? handleApplyButtonClick()
-          : isLastStepCorrect
-          ? handlenextButtonClick()
-          : handleAgainButtonClick()
-  }
+    isTaskFinished
+    ? handlenextButtonClick()
+    : !isWrongStep
+    ? handleApplyButtonClick()
+    : handleAgainButtonClick();
+  };
+
+  const buttonText = isTaskFinished
+    ? 'Следующее задание'
+    : !isWrongStep
+    ? 'Применить'
+    : 'Еще раз';
 
   const setColor = (value: string) => {
-    console.log(selectedIndex !== value || !isCompleted);
+    console.log(selectedIndex !== value || !isWrongStep);
 
-    return selectedIndex !== value || !isCompleted
+    return selectedIndex !== value || !isWrongStep
       ? 'inital'
       : correctValue === value
       ? '#66BB6A80 !important'
@@ -108,13 +116,7 @@ export function TaskAnswerList({
           );
         })}
       </List>
-      <Button onClick={buttonClickAction}>
-        {!isCompleted
-          ? 'Применить'
-          : isLastStepCorrect
-          ? 'Продолжить'
-          : 'Еще раз'}
-      </Button>
+      <Button onClick={buttonClickAction}>{buttonText}</Button>
     </Root>
   );
 }

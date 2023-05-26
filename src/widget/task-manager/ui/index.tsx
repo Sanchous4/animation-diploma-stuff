@@ -79,18 +79,12 @@ const TaskExample: IStep[] = [
   }
 ]
 
-const data = [
-  { value: '1', label: 'factorial *= i ' },
-  { value: '2', label: 'factorial += i ' },
-  { value: '3', label: 'factorial -= i ' },
-  { value: '4', label: 'factorial = i ' },
-];
-
 export const TaskManager = () => {
   const [currentStep, setStep] = useState(0);
 
-  const [isCompletedStep, setCompletedStep] = useState(false);
-  const [isLastStepCorrect, setLastStepCorrect] = useState(false);
+  const [isWrongStep, setIsWrongStep] = useState(false);
+  const [isTaskFinished, setTaskFinished] = useState(false);
+
 
   return (
     <Root>
@@ -98,22 +92,27 @@ export const TaskManager = () => {
       <TaskAnswerList
         options={TaskExample[currentStep].options}
         correctValue={TaskExample[currentStep].correctValue}
-        isCompleted={isCompletedStep}
-        isLastStepCorrect={isLastStepCorrect}
+        isWrongStep={isWrongStep}
+        isTaskFinished={isTaskFinished}
         completeCallback={(_value, isCorrect) => {
-          setCompletedStep(true);
           if (isCorrect) {
-            setLastStepCorrect(true)
+            setIsWrongStep(false);
+            if (currentStep + 1 === TaskExample.length - 1) {
+              setTaskFinished(true)
+            }
+            setStep((currentStep) => currentStep + 1)
+          }
+          else {
+            setIsWrongStep(true);
           }
         }}
         againCallback={() => {
-          setCompletedStep(false)
-          setLastStepCorrect(false)
+          setIsWrongStep(false)
         }}
         nextCallback={() => {
-          setCompletedStep(false)
-          setLastStepCorrect(false)
-          setStep((currentStep) => currentStep + 1)
+          setIsWrongStep(false)
+          setTaskFinished(false)
+          setStep(0)
         }}
       />
     </Root>
